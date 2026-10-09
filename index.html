@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORPORATE PRO // Biznes Boshqaruv Platformasi</title>
+    <!-- FontAwesome belgilar to'plami -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js Vizual grafiklar uchun -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Yon Menyu (Sidebar) -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo"><i class="fa-solid fa-building"></i></div>
+                <h2>CORP<span>PRO</span></h2>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" onclick="switchSection('dashboard', event)">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('projects', event)">
+                    <i class="fa-solid fa-diagram-project"></i> Loyihalar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('clients', event)">
+                    <i class="fa-solid fa-users"></i> Mijozlar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('team', event)">
+                    <i class="fa-solid fa-user-group"></i> Jamoa
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('finance', event)">
+                    <i class="fa-solid fa-wallet"></i> Moliya
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('tasks', event)">
+                    <i class="fa-solid fa-clipboard-check"></i> Vazifalar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('calendar', event)">
+                    <i class="fa-solid fa-calendar-days"></i> Kalendar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('settings', event)">
+                    <i class="fa-solid fa-gear"></i> Sozlamalar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('reports', event)">
+                    <i class="fa-solid fa-file-lines"></i> Hisobotlar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('notes', event)">
+                    <i class="fa-solid fa-note-sticky"></i> Eslatmalar
+                </a>
+                <a href="#" class="menu-item" onclick="switchSection('activity', event)">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Faoliyat
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fa-solid fa-user-tie avatar"></i>
+                    <div>
+                        <h4>Sardorbek</h4>
+                        <small>Bosh Direktor</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Asosiy Ishchi Maydon (Main Content) -->
+        <main class="main-content">
+            <!-- Yuqori qism (Header) -->
+            <header class="top-header">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Loyihalar, mijozlar yoki topshiriqlardan qidirish..." oninput="handleSearch()">
+                </div>
+
+                <div class="header-actions">
+                    <!-- Real-time Soat va Sana -->
+                    <div class="live-clock" id="liveClock">
+                        <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
+                    </div>
+
+                    <button class="icon-btn" id="darkBtn" title="Qorong'u rejim" onclick="toggleDark(!document.body.classList.contains('dark'))">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+
+                    <button class="icon-btn notification" onclick="showNotification()">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="dot"></span>
+                    </button>
+                    <button class="btn-primary" onclick="openNewProjectModal()">
+                        <i class="fa-solid fa-plus"></i> Yangi Loyiha
+                    </button>
+
+                    <div class="notif-panel" id="notifPanel"></div>
+                </div>
+            </header>
+
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard" class="content-section active">
+                <div class="page-title">
+                    <h1>Kompaniya Umumiy Ko'rsatkichlari</h1>
+                    <p>Barcha bo'limlar va moliya bo'yicha jonli statistika</p>
+                </div>
+
+                <!-- Kartalar (Stats Grid) -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fa-solid fa-money-bill-wave"></i></div>
+                        <div class="stat-details">
+                            <small>Jami Loyiha Byudjeti</small>
+                            <h3 id="statTotalRevenue">$0</h3>
+                            <span class="badge success"><i class="fa-solid fa-arrow-up"></i> +12.5%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fa-solid fa-list-check"></i></div>
+                        <div class="stat-details">
+                            <small>Faol Loyihalar</small>
+                            <h3 id="statProjectCount">0 ta</h3>
+                            <span class="badge info">Jarayonda</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fa-solid fa-handshake"></i></div>
+                        <div class="stat-details">
+                            <small>Yangi Mijozlar</small>
+                            <h3>24 ta</h3>
+                            <span class="badge success"><i class="fa-solid fa-arrow-up"></i> +8.2%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fa-solid fa-user-gear"></i></div>
+                        <div class="stat-details">
+                            <small>Jamoa A'zolari</small>
+                            <h3>16 kishi</h3>
+                            <span class="badge purple">To'liq tarkib</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QO'SHIMCHA: Interactive Analytics Chart -->
+                <div class="chart-container-box">
+                    <h3><i class="fa-solid fa-chart-area"></i> Oylik Daromad va Xarajatlar Dinamikasi</h3>
+                    <canvas id="revenueChart" height="90"></canvas>
+                </div>
+
+                <!-- Doughnut grafik va yaqin muddatlar -->
+                <div class="two-col">
+                    <div class="chart-container-box">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Loyihalar holati</h3>
+                        <div class="doughnut-wrap"><canvas id="statusChart"></canvas></div>
+                    </div>
+                    <div class="chart-container-box">
+                        <h3><i class="fa-solid fa-hourglass-half"></i> Yaqinlashayotgan muddatlar</h3>
+                        <div id="deadlineList"></div>
+                    </div>
+                </div>
+
+                <!-- Loyihalar va Ishlar Jadvali -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>So'nggi Loyihalar Holati</h2>
+                        <button class="btn-secondary" onclick="exportData()">Eksport (CSV)</button>
+                    </div>
+
+                    <div class="chip-row" id="statusChips">
+                        <button class="chip active" data-status="all" onclick="setStatusFilter('all')">Barchasi</button>
+                        <button class="chip" data-status="Pending" onclick="setStatusFilter('Pending')">Kutilmoqda</button>
+                        <button class="chip" data-status="In Progress" onclick="setStatusFilter('In Progress')">Jarayonda</button>
+                        <button class="chip" data-status="Completed" onclick="setStatusFilter('Completed')">Bajarildi</button>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-key="name" onclick="sortBy('name')">Loyiha Nomi</th>
+                                <th class="sortable" data-key="client" onclick="sortBy('client')">Mijoz / Firma</th>
+                                <th class="sortable" data-key="deadline" onclick="sortBy('deadline')">Muddat</th>
+                                <th class="sortable" data-key="budget" onclick="sortBy('budget')">Byudjet</th>
+                                <th class="sortable" data-key="status" onclick="sortBy('status')">Holat (Status)</th>
+                                <th>Harakat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                            <!-- JS orqali to'ldiriladi -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- LOYIHALAR SECTION -->
+            <section id="projects" class="content-section">
+                <div class="page-title">
+                    <h1>Loyihalar Boshqaruvi</h1>
+                    <p>Barcha faol va yakunlangan topshiriqlar ro'yxati</p>
+                </div>
+                <div class="kanban-grid">
+                    <div class="kanban-col">
+                        <h3><i class="fa-solid fa-clock"></i> Rejalashtirilgan</h3>
+                        <div class="kanban-cards" id="colTodo"></div>
+                    </div>
+                    <div class="kanban-col">
+                        <h3><i class="fa-solid fa-spinner"></i> Jarayonda</h3>
+                        <div class="kanban-cards" id="colInProgress"></div>
+                    </div>
+                    <div class="kanban-col">
+                        <h3><i class="fa-solid fa-circle-check"></i> Bajarildi</h3>
+                        <div class="kanban-cards" id="colDone"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MIJOZLAR SECTION -->
+            <section id="clients" class="content-section">
+                <div class="page-title">
+                    <h1>Mijozlar va Hamkorlar</h1>
+                    <p>Kompaniya bilan ishlayotgan korxonalar va mijozlar bazasi</p>
+                </div>
+                <div class="toolbar">
+                    <div class="toolbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="clientSearch" placeholder="Mijoz qidirish..." oninput="renderClientsAndTeam()">
+                    </div>
+                    <button class="btn-primary" onclick="openModalById('clientModal')">
+                        <i class="fa-solid fa-plus"></i> Yangi Mijoz
+                    </button>
+                </div>
+                <div class="client-cards-grid" id="clientsGrid">
+                    <!-- JS orqali to'ldiriladi -->
+                </div>
+            </section>
+
+            <!-- JAMOA SECTION -->
+            <section id="team" class="content-section">
+                <div class="page-title">
+                    <h1>Kompaniya Jamoasi</h1>
+                    <p>Xodimlar, ularning lavozimlari va aloqa ma'lumotlari</p>
+                </div>
+                <div class="toolbar">
+                    <div class="toolbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="teamSearch" placeholder="Xodim qidirish..." oninput="renderClientsAndTeam()">
+                    </div>
+                    <button class="btn-primary" onclick="openModalById('teamModal')">
+                        <i class="fa-solid fa-plus"></i> Yangi Xodim
+                    </button>
+                </div>
+                <div class="team-grid" id="teamGrid">
+                    <!-- JS orqali to'ldiriladi -->
+                </div>
+            </section>
+
+            <!-- MOLIYA SECTION -->
+            <section id="finance" class="content-section">
+                <div class="page-title">
+                    <h1>Moliya va Xarajatlar</h1>
+                    <p>Kirim-chiqimlar va moliyaviy hisobotlar</p>
+                </div>
+                <div class="finance-summary">
+                    <div class="fin-box green">
+                        <h4>Jami Kirim</h4>
+                        <h2 id="finIncome">$124,500</h2>
+                    </div>
+                    <div class="fin-box red">
+                        <h4>Jami Chiqim</h4>
+                        <h2>$42,100</h2>
+                    </div>
+                    <div class="fin-box blue">
+                        <h4>Sof Foyda</h4>
+                        <h2 id="finProfit">$82,400</h2>
+                    </div>
+                </div>
+
+                <div class="fin-grid">
+                    <div class="chart-container-box">
+                        <h3><i class="fa-solid fa-chart-column"></i> Xarajatlar kategoriyalar bo'yicha</h3>
+                        <canvas id="expenseChart" height="140"></canvas>
+                    </div>
+                    <div class="panel-box">
+                        <h3 style="margin-bottom:1rem;">Yangi operatsiya</h3>
+                        <div class="tx-form">
+                            <select id="txType">
+                                <option value="income">Kirim</option>
+                                <option value="expense">Chiqim</option>
+                            </select>
+                            <input type="text" id="txDesc" placeholder="Tavsif (masalan: Hosting to'lovi)">
+                            <select id="txCat">
+                                <option>Loyiha</option>
+                                <option>Maosh</option>
+                                <option>Ijara</option>
+                                <option>Marketing</option>
+                                <option>Uskunalar</option>
+                                <option>Boshqa</option>
+                            </select>
+                            <input type="number" id="txAmount" placeholder="Summa ($)">
+                            <button class="btn-primary" onclick="addTransaction()"><i class="fa-solid fa-plus"></i> Qo'shish</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top:1.5rem;">
+                    <div class="table-header"><h2>Operatsiyalar tarixi</h2></div>
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>Sana</th><th>Tavsif</th><th>Kategoriya</th><th>Summa</th><th>Harakat</th></tr>
+                        </thead>
+                        <tbody id="txBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VAZIFALAR SECTION -->
+            <section id="tasks" class="content-section">
+                <div class="page-title">
+                    <h1>Vazifalar Ro'yxati</h1>
+                    <p>Kundalik topshiriqlar va ularning bajarilish darajasi</p>
+                </div>
+                <div class="panel-box">
+                    <div class="task-add">
+                        <input type="text" id="taskInput" placeholder="Yangi vazifa yozing va Enter bosing..." onkeydown="if(event.key==='Enter') addTask()">
+                        <select id="taskPriority">
+                            <option value="high">Yuqori</option>
+                            <option value="medium" selected>O'rta</option>
+                            <option value="low">Past</option>
+                        </select>
+                        <button class="btn-primary" onclick="addTask()"><i class="fa-solid fa-plus"></i> Qo'shish</button>
+                    </div>
+                    <div class="task-progress">
+                        <div class="progress-bar"><div id="taskProgressFill"></div></div>
+                        <small id="taskProgressText">0% bajarildi</small>
+                    </div>
+                    <div class="chip-row" id="taskChips">
+                        <button class="chip active" data-filter="all" onclick="setTaskFilter('all')">Barchasi</button>
+                        <button class="chip" data-filter="open" onclick="setTaskFilter('open')">Faol</button>
+                        <button class="chip" data-filter="done" onclick="setTaskFilter('done')">Bajarilgan</button>
+                    </div>
+                    <ul id="taskList" class="task-list"></ul>
+                </div>
+            </section>
+
+            <!-- KALENDAR SECTION -->
+            <section id="calendar" class="content-section">
+                <div class="page-title">
+                    <h1>Muddatlar Kalendari</h1>
+                    <p>Loyihalarning topshirish sanalari</p>
+                </div>
+                <div class="calendar-layout">
+                    <div class="panel-box">
+                        <div class="cal-head">
+                            <button class="icon-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                            <h3 id="calTitle"></h3>
+                            <button class="icon-btn" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <div class="cal-grid cal-weekdays">
+                            <span>Du</span><span>Se</span><span>Ch</span><span>Pa</span><span>Ju</span><span>Sh</span><span>Ya</span>
+                        </div>
+                        <div class="cal-grid" id="calDays"></div>
+                    </div>
+                    <div class="panel-box">
+                        <h3 id="calSideTitle">Yaqin muddatlar</h3>
+                        <div id="calSideList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SOZLAMALAR SECTION -->
+            <section id="settings" class="content-section">
+                <div class="page-title">
+                    <h1>Sozlamalar</h1>
+                    <p>Platforma ko'rinishi va ma'lumotlarni boshqarish</p>
+                </div>
+                <div class="panel-box settings-box">
+                    <div class="setting-row">
+                        <div><h4>Qorong'u rejim</h4><small>Ko'zni charchatmaydigan to'q fon</small></div>
+                        <label class="switch">
+                            <input type="checkbox" id="darkSwitch" onchange="toggleDark(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div><h4>Asosiy rang</h4><small>Tugmalar va menyu rangi</small></div>
+                        <input type="color" id="accentColor" value="#2563eb" oninput="setAccent(this.value)">
+                    </div>
+                    <div class="setting-row">
+                        <div><h4>Ma'lumotlarni tiklash</h4><small>Saqlangan barcha o'zgarishlar o'chiriladi</small></div>
+                        <button class="btn-secondary" onclick="resetData()"><i class="fa-solid fa-rotate-left"></i> Tiklash</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISOBOTLAR SECTION -->
+            <section id="reports" class="content-section">
+                <div class="page-title">
+                    <h1>Hisobotlar</h1>
+                    <p>Loyihalar bo'yicha umumiy tahlil va ma'lumotlarni zaxiralash</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fa-solid fa-sack-dollar"></i></div>
+                        <div class="stat-details">
+                            <small>Umumiy byudjet</small>
+                            <h3 id="rpTotal">$0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="stat-details">
+                            <small>Yakunlangan loyihalar summasi</small>
+                            <h3 id="rpDone">$0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <div class="stat-details">
+                            <small>O'rtacha byudjet</small>
+                            <h3 id="rpAvg">$0</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-details">
+                            <small>Muddati o'tgan</small>
+                            <h3 id="rpOverdue">0 ta</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="chart-container-box">
+                        <h3><i class="fa-solid fa-chart-column"></i> Mijozlar bo'yicha byudjet</h3>
+                        <div class="doughnut-wrap"><canvas id="clientChart"></canvas></div>
+                    </div>
+                    <div class="panel-box" style="margin-bottom:2rem;">
+                        <h3 style="margin-bottom:1rem;">Bajarilish darajasi</h3>
+                        <div class="progress-bar"><div id="rpProgressFill"></div></div>
+                        <small id="rpProgressText">0% loyiha yakunlangan</small>
+
+                        <h3 style="margin:1.5rem 0 0.5rem;">Amallar</h3>
+                        <div class="btn-row">
+                            <button class="btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> Chop etish</button>
+                            <button class="btn-secondary" onclick="exportTasks()"><i class="fa-solid fa-file-csv"></i> Vazifalar CSV</button>
+                            <button class="btn-secondary" onclick="exportTx()"><i class="fa-solid fa-file-csv"></i> Moliya CSV</button>
+                            <button class="btn-secondary" onclick="backupData()"><i class="fa-solid fa-download"></i> Zaxira (JSON)</button>
+                            <button class="btn-secondary" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> Zaxirani tiklash</button>
+                            <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importBackup(event)">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ESLATMALAR SECTION -->
+            <section id="notes" class="content-section">
+                <div class="page-title">
+                    <h1>Eslatmalar</h1>
+                    <p>Tez yozib qo'yiladigan qaydlar</p>
+                </div>
+                <div class="panel-box" style="margin-bottom:1.5rem;">
+                    <div class="task-add" style="margin-bottom:0;">
+                        <input type="text" id="noteInput" placeholder="Eslatma yozing va Enter bosing..." onkeydown="if(event.key==='Enter') addNote()">
+                        <select id="noteColor">
+                            <option value="yellow">Sariq</option>
+                            <option value="green">Yashil</option>
+                            <option value="blue">Ko'k</option>
+                            <option value="pink">Pushti</option>
+                        </select>
+                        <button class="btn-primary" onclick="addNote()"><i class="fa-solid fa-plus"></i> Qo'shish</button>
+                    </div>
+                </div>
+                <div class="notes-grid" id="notesGrid"></div>
+            </section>
+
+            <!-- FAOLIYAT JURNALI SECTION (yangi) -->
+            <section id="activity" class="content-section">
+                <div class="page-title">
+                    <h1>Faoliyat Jurnali</h1>
+                    <p>Platformadagi so'nggi harakatlar tarixi</p>
+                </div>
+                <div class="panel-box">
+                    <div class="table-header">
+                        <h3>So'nggi harakatlar</h3>
+                        <button class="btn-secondary" onclick="clearActivity()"><i class="fa-solid fa-broom"></i> Tozalash</button>
+                    </div>
+                    <ul id="activityList" class="activity-list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Yangi Loyiha Qo'shish -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Yangi Loyiha Qo'shish</h3>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Loyiha Nomi</label>
+                    <input type="text" id="modalProjName" placeholder="Masalan: ERP Tizim Yaratish">
+                </div>
+                <div class="form-group">
+                    <label>Mijoz / Companiya Nomi</label>
+                    <input type="text" id="modalClient" placeholder="Masalan: IT-Park LLC">
+                </div>
+                <div class="form-group">
+                    <label>Byudjet ($)</label>
+                    <input type="number" id="modalBudget" placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label>Holati</label>
+                    <select id="modalStatus">
+                        <option value="In Progress">Jarayonda</option>
+                        <option value="Pending">Kutilmoqda</option>
+                        <option value="Completed">Bajarildi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Bekor qilish</button>
+                <button class="btn-primary" onclick="addProjectFromModal()">Qo'shish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Yangi Mijoz -->
+    <div class="modal-overlay" id="clientModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Yangi Mijoz Qo'shish</h3>
+                <span class="close-btn" onclick="closeModalById('clientModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Kompaniya nomi</label>
+                    <input type="text" id="cName" placeholder="Masalan: Uzum Market">
+                </div>
+                <div class="form-group">
+                    <label>Soha</label>
+                    <input type="text" id="cCategory" placeholder="Masalan: Elektron tijorat">
+                </div>
+                <div class="form-group">
+                    <label>Faol loyihalar soni</label>
+                    <input type="number" id="cProjects" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="text" id="cPhone" placeholder="+998 90 123 45 67">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModalById('clientModal')">Bekor qilish</button>
+                <button class="btn-primary" onclick="addClient()">Qo'shish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Yangi Xodim -->
+    <div class="modal-overlay" id="teamModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Yangi Xodim Qo'shish</h3>
+                <span class="close-btn" onclick="closeModalById('teamModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Ism familiya</label>
+                    <input type="text" id="tName" placeholder="Masalan: Aziz Karimov">
+                </div>
+                <div class="form-group">
+                    <label>Lavozim</label>
+                    <input type="text" id="tRole" placeholder="Masalan: Frontend Dasturchi">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" id="tEmail" placeholder="aziz@corppro.uz">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModalById('teamModal')">Bekor qilish</button>
+                <button class="btn-primary" onclick="addTeamMember()">Qo'shish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Loyihani tahrirlash -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Loyihani Tahrirlash</h3>
+                <span class="close-btn" onclick="closeModalById('editModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="epId">
+                <div class="form-group">
+                    <label>Loyiha nomi</label>
+                    <input type="text" id="epName">
+                </div>
+                <div class="form-group">
+                    <label>Mijoz / Kompaniya</label>
+                    <input type="text" id="epClient">
+                </div>
+                <div class="form-group">
+                    <label>Muddat</label>
+                    <input type="date" id="epDeadline">
+                </div>
+                <div class="form-group">
+                    <label>Byudjet ($)</label>
+                    <input type="number" id="epBudget">
+                </div>
+                <div class="form-group">
+                    <label>Holati</label>
+                    <select id="epStatus">
+                        <option value="Pending">Kutilmoqda</option>
+                        <option value="In Progress">Jarayonda</option>
+                        <option value="Completed">Bajarildi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModalById('editModal')">Bekor qilish</button>
+                <button class="btn-primary" onclick="saveEditProject()">Saqlash</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== QO'SHIMCHA BLOK (yangi) ===== -->
+
+    <!-- ASBOBLAR SECTION (JS uni <main> ichiga ko'chiradi) -->
+    <section id="tools" class="content-section">
+        <div class="page-title">
+            <h1>Foydali Asboblar</h1>
+            <p>Diqqat taymeri, valyuta konvertori va oylik maqsad</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Pomodoro -->
+            <div class="panel-box">
+                <h3 class="tool-title"><i class="fa-solid fa-stopwatch"></i> Diqqat taymeri</h3>
+                <div class="timer-display" id="pomoDisplay">25:00</div>
+                <div class="timer-modes">
+                    <button class="chip active" data-min="25" onclick="setPomoMode(25, this)">Ish 25</button>
+                    <button class="chip" data-min="5" onclick="setPomoMode(5, this)">Dam 5</button>
+                    <button class="chip" data-min="15" onclick="setPomoMode(15, this)">Uzoq dam 15</button>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-primary" id="pomoToggle" onclick="togglePomo()"><i class="fa-solid fa-play"></i> Boshlash</button>
+                    <button class="btn-secondary" onclick="resetPomo()"><i class="fa-solid fa-rotate-left"></i> Qayta</button>
+                </div>
+                <small class="tool-note" id="pomoCount">Bugun yakunlangan: 0 ta</small>
+            </div>
+
+            <!-- Valyuta konvertori -->
+            <div class="panel-box">
+                <h3 class="tool-title"><i class="fa-solid fa-money-bill-transfer"></i> Valyuta konvertori</h3>
+                <div class="form-group">
+                    <label>Kurs (1 USD = ... so'm)</label>
+                    <input type="number" id="fxRate" value="12700" oninput="convertFx('usd')">
+                </div>
+                <div class="form-group">
+                    <label>USD ($)</label>
+                    <input type="number" id="fxUsd" placeholder="100" oninput="convertFx('usd')">
+                </div>
+                <div class="form-group">
+                    <label>So'm (UZS)</label>
+                    <input type="number" id="fxUzs" placeholder="1270000" oninput="convertFx('uzs')">
+                </div>
+            </div>
+
+            <!-- Oylik maqsad -->
+            <div class="panel-box">
+                <h3 class="tool-title"><i class="fa-solid fa-bullseye"></i> Oylik maqsad</h3>
+                <div class="form-group">
+                    <label>Maqsad summasi ($)</label>
+                    <input type="number" id="goalInput" placeholder="20000" oninput="saveGoal()">
+                </div>
+                <div class="progress-bar"><div id="goalFill"></div></div>
+                <small class="tool-note" id="goalText">Maqsad belgilanmagan</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tepaga qaytish tugmasi -->
+    <button class="to-top" id="toTop" title="Tepaga" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Tezkor tugmalar oynasi -->
+    <div class="modal-overlay" id="shortcutModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Tezkor tugmalar</h3>
+                <span class="close-btn" onclick="closeModalById('shortcutModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <ul class="shortcut-list">
+                    <li><span><kbd>/</kbd> yoki <kbd>Ctrl</kbd>+<kbd>K</kbd></span> Qidiruvga o'tish</li>
+                    <li><span><kbd>N</kbd></span> Yangi loyiha</li>
+                    <li><span><kbd>D</kbd></span> Qorong'u rejim</li>
+                    <li><span><kbd>?</kbd></span> Shu oyna</li>
+                    <li><span><kbd>Esc</kbd></span> Oynani yopish</li>
+                    <li><span><kbd>Ctrl</kbd>+<kbd>/</kbd></span> Global qidiruv</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global qidiruv oynasi (yangi) -->
+    <div class="modal-overlay" id="paletteModal">
+        <div class="modal-box palette-box">
+            <input type="text" id="paletteInput" placeholder="Loyiha, mijoz, xodim, vazifa yoki eslatma qidiring..." autocomplete="off">
+            <div id="paletteResults"></div>
+            <small class="palette-hint">↑ ↓ tanlash · Enter ochish · Esc yopish</small>
+        </div>
+    </div>
+
+    <!-- JS Fayli -->
+    <script src="./script.js"></script>
+</body>
+</html>
